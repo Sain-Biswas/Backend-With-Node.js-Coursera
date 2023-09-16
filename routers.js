@@ -35,35 +35,24 @@ router.get('/search', function (req, res) {
 // GET by specific ID request: Task 5 : Get book Review
 router.get('/review/:isbn', function (req, res) {
     res.header("Content-Type", "application/json");
-    const isbn = req.params.isbn;
-    let result_arr = books_list.filter((ele) => {
-        return ele["isbn"] == isbn
+    const isbn = Number.parseInt(req.params.isbn);
+    let result_arr = []
+    books_list.map((ele) => {
+        if (ele["isbn"] == isbn) {
+            result_arr.push(ele)
+        }
     })
     if (result_arr.length > 0) {
-        res.end(result_arr["review"])
+        console.log(result_arr["review"])
+        res.json(result_arr["review"])
     }
     else {
         res.status(404).send("No Entry Available :( ")
     }
 });
 
-// POST request: Task 8 : Add a book review
-router.post("/review/:isbn", function (req, res) {
-    if (req.username) {
-        for (let i = 0; i < books_list.length; i++) {
-            if (books_list[i]["isbn"] == req.params.isbn) {
-                books_list[i]["review"][req.username] = req.body.userreview
-            }
-        }
-        res.end()
-    }
-    else {
-        return res.status(403).send("Login First to access this Feature !")
-    }
-});
 
-
-// PUT request: Task 8 : Modify a book review
+// PUT request: Task 8 : Add/Modify a book review
 router.put("/review/:isbn", function (req, res) {
     if (req.username) {
         for (let i = 0; i < books_list.length; i++) {
@@ -71,6 +60,7 @@ router.put("/review/:isbn", function (req, res) {
                 books_list[i]["review"][req.username] = req.body.userreview
             }
         }
+        res.end(`Review has been added/updated for ISBN : ${req.params.isbn}`)
     }
     else {
         return res.status(403).send("Login First to access this Feature !")
@@ -86,7 +76,7 @@ router.delete("/review/:isbn", (req, res) => {
                 delete books_list[i]["review"][req.username]
             }
         }
-        res.end()
+        res.end(`Review has been deleted for ISBN : ${req.params.isbn}`)
     }
     else {
         return res.status(403).send("Login First to access this Feature !")
